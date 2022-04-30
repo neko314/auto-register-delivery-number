@@ -83,7 +83,7 @@ def decode_snooz(snooz):
     # Oddly, the file header (9 bytes) is not compressed, but the rest is.
     decompressed = zlib.decompress(snooz[9:])
 
-    sys.stdout.write(b'btsnoop\x00\x00\x00\x00\x01\x00\x00\x03\xea')
+    sys.stdout.buffer.write(b'btsnoop\x00\x00\x00\x00\x01\x00\x00\x03\xea')
 
     if version == 1:
         decode_snooz_v1(decompressed, last_timestamp_ms)
@@ -112,12 +112,12 @@ def decode_snooz_v1(decompressed, last_timestamp_ms):
             '=HIb', decompressed, offset)
         first_timestamp_ms += delta_time_ms
         offset += 7
-        sys.stdout.write(struct.pack('>II', length, length))
-        sys.stdout.write(struct.pack('>II', type_to_direction(type), 0))
-        sys.stdout.write(struct.pack(
+        sys.stdout.buffer.write(struct.pack('>II', length, length))
+        sys.stdout.buffer.write(struct.pack('>II', type_to_direction(type), 0))
+        sys.stdout.buffer.write(struct.pack(
             '>II', (first_timestamp_ms >> 32), (first_timestamp_ms & 0xFFFFFFFF)))
-        sys.stdout.write(type_to_hci(type))
-        sys.stdout.write(decompressed[offset:offset + length - 1])
+        sys.stdout.buffer.write(type_to_hci(type))
+        sys.stdout.buffer.write(decompressed[offset:offset + length - 1])
         offset += length - 1
 
 
@@ -142,13 +142,13 @@ def decode_snooz_v2(decompressed, last_timestamp_ms):
             '=HHIb', decompressed, offset)
         first_timestamp_ms += delta_time_ms
         offset += 9
-        sys.stdout.write(struct.pack('>II', packet_length, length))
-        sys.stdout.write(struct.pack(
+        sys.stdout.buffer.write(struct.pack('>II', packet_length, length))
+        sys.stdout.buffer.write(struct.pack(
             '>II', type_to_direction(snooz_type), 0))
-        sys.stdout.write(struct.pack(
+        sys.stdout.buffer.write(struct.pack(
             '>II', (first_timestamp_ms >> 32), (first_timestamp_ms & 0xFFFFFFFF)))
-        sys.stdout.write(type_to_hci(snooz_type))
-        sys.stdout.write(decompressed[offset:offset + length - 1])
+        sys.stdout.buffer.write(type_to_hci(snooz_type))
+        sys.stdout.buffer.write(decompressed[offset:offset + length - 1])
         offset += length - 1
 
 
